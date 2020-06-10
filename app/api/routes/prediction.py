@@ -3,14 +3,16 @@ from fastapi import APIRouter
 
 from app.models.payloads import RequestPayload
 from app.models.prediction import PredictionResult
-from app.conf.config import MODEL_PATH
+#from app.conf.config import MODEL_PATH
+from os import getenv
 import joblib
 
 
 router = APIRouter()
 
-clf = joblib.load(MODEL_PATH)
+MODEL_PATH = getenv("MODEL_PATH", "")
 
+clf = joblib.load(MODEL_PATH)
 
 
 @router.post("/predict", response_model=PredictionResult, name="predict")

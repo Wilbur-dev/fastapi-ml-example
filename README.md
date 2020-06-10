@@ -1,34 +1,20 @@
 # FastAPI App to serve machine learning models
 
-An example of how to use FastAPI to serve machine learning models.
+An example of how to use FastAPI to serve machine learning models. This dockerized app serves prediction from a simple Linear Regression model trained over dummy data created in scikit-learn.
 
 ## Requirements
+Docker and docker-compose installed on your machine. 
 
-Python 3.6+
-
-## Installation
-Install the required packages in your local environment.
-```bash
-pip install -r requirements
-``` 
-
-### creating the model
-
-This app serves a simple Linear Regression model trained over dummy data created in scikit-learn. The model is serialized using joblib. To generate the serialized model, run
-```bash
-$ cd app/sklearn_model
-$ python ml_train.py
-```
-This will generate the model and save in `/app/sklearn_model`
 
 ## start the app
 
-1. Start the application from the root dir:  
+From the root directory, run
 ```bash
- uvicorn app.main:app --reload
-```
+$ docker-compose up
+```  
 
-2. Go to [http://localhost:8000/docs](http://localhost:8000/docs)
+
+Go to [http://localhost:8000/docs](http://localhost:8000/docs)
 
 ### API Endpoints
 
@@ -39,7 +25,7 @@ Simple GET request to check that the app is running.
 Response body:
 ```json
 {
-  "is_alive": True
+  "is_alive": true
 }
 ```
 
@@ -51,8 +37,8 @@ Request body:
 
 ```json
 {
-  "feature1": 0.1,
-  "feature2": 0.5
+  "feature1": 0.50,
+  "feature2": 0.98
 }
 ```
 
@@ -60,17 +46,17 @@ Response body:
 
 ```json
 {
-  "label": 0,
+  "label": 1,
   "probability": [
-    0.9998993774602198,
-    0.00010062253978017755
+    0.02087666131346566,
+    0.9791233386865343
   ]
 }
 ```
 
 Also, with curl
 ```bash
-curl -X POST "http://127.0.0.1:8000/predict" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"feature1\":0.1,\"feature2\":0.5}"
+curl -X POST "http://0.0.0.0:8000/predict" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"feature1\":0.5,\"feature2\":0.98}"
 ```
 
    

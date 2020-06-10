@@ -8,7 +8,7 @@ from joblib import dump
 
 def train_model():
     '''train LR model using generated data'''
-    X, y = make_blobs(n_samples=1000, centers=2, n_features=2, random_state=4)
+    X, y = make_blobs(n_samples=100, centers=2, n_features=2, random_state=0)
     logger.debug('data.shape: {}'.format(X.shape))
 
 

@@ -8,7 +8,6 @@ __pycache__
 *.mypy_cache
 .python-version
 *.pkl
-*.joblib
 *.DS_Store
 *.idea
 
