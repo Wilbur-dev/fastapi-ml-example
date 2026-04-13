@@ -1,4 +1,24 @@
+from fastapi import APIRouter, Request
 
+from app.models.payloads import RequestPayload
+from app.models.prediction import PredictionResult
+
+router = APIRouter()
+
+
+@router.post("/predict", response_model=PredictionResult, name="predict")
+def post_predict(payload: RequestPayload, request: Request):
+
+    service = request.app.state.inference_service
+
+    result = service.predict(payload)
+
+    return PredictionResult(**result)
+
+
+
+
+'''
 from fastapi import APIRouter
 
 from app.models.payloads import RequestPayload
@@ -29,3 +49,5 @@ def post_predict(payload: RequestPayload = None) -> PredictionResult:
     pred = PredictionResult(label=y, probability=prob)
 
     return pred
+    
+'''

@@ -2,14 +2,26 @@ version: "3"
 
 services:
   api:
-    build: ./app
+    build: 
+      context: .
+      dockerfile: Dockerfile
     container_name: fastapi-ml
+    volumes:
+      - .:/app
     environment:
-      - MODEL_PATH=/opt/app/sklearn_model/lr_model.joblib
+      - MODEL_PATH=/app/models/lr_model.joblib
     ports:
       - "8000:8000"
     networks:
       - network
+      
+  trainer:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+    command: python3 training/training.py
 
 networks:
     network: {}

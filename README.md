@@ -1,63 +1,74 @@
-# FastAPI App to serve machine learning models
+# fastapi-ml-example
 
-An example of how to use FastAPI to serve machine learning models. This dockerized app serves prediction from a simple Linear Regression model trained over dummy data created in scikit-learn.
+A production-style example project for serving a machine learning model with **FastAPI**.
 
-## Requirements
-Docker and docker-compose installed on your machine. 
+This project demonstrates how to package a simple ML inference workflow into a clean backend service, including API design, model loading, request validation, health checks, and local development setup.
 
+---
 
-## start the app
+## Features
 
-From the root directory, run
+- FastAPI-based REST API for model inference
+- Clear project structure for backend + ML serving
+- Request/response schema validation with Pydantic
+- Health check endpoint for service monitoring
+- Ready for local development and future Docker deployment
+- Simple example for learning ML model serving fundamentals
+
+---
+
+## Tech Stack
+
+- **Python**
+- **FastAPI**
+- **Uvicorn**
+- **Pydantic**
+- **Scikit-learn** / ML model artifact
+- **Git**
+
+---
+
+## Project Structure
+
 ```bash
-$ docker-compose up
-```  
-
-
-Go to [http://localhost:8000/docs](http://localhost:8000/docs)
-
-### API Endpoints
-
-Each API presents the following endpoints.
-#### `GET /health`
-Simple GET request to check that the app is running.
-
-Response body:
-```json
-{
-  "is_alive": true
-}
+fastapi-ml-example/
+├── app/
+│   ├── api/
+│   │   └── routes/
+│   ├── core/
+│   ├── infrastructure/
+│   │   └── model/
+│   ├── models/
+│   ├── services/
+│   └── main.py
+├── training/
+│   └── train_ml_model.py
+├── models/
+│   └── lr_model.joblib
+├── tests/
+├── docs/
+├── Dockerfile
+├── docker-compose.yaml
+├── requirements.txt
+└── README.md
 ```
 
-#### `POST /predict`
 
-for each sample, predicts the most likely class and returns its probability.
-
-Request body:
-
-```json
-{
-  "feature1": 0.50,
-  "feature2": 0.98
-}
-```
-
-Response body:
-
-```json
-{
-  "label": 1,
-  "probability": [
-    0.02087666131346566,
-    0.9791233386865343
-  ]
-}
-```
-
-Also, with curl
+## Run with Docker
 ```bash
-curl -X POST "http://0.0.0.0:8000/predict" -H "accept: application/json" -H "Content-Type: application/json" -d "{\"feature1\":0.5,\"feature2\":0.98}"
+docker compose up --build
 ```
 
-   
 
+## Run Tests
+```bash
+docker compose up --build -d
+docker compose run --rm api pytest -q
+```
+
+## Example Requests:
+- curl http://localhost:8000/health
+- curl http://localhost:8000/version
+- curl -X POST http://localhost:8000/predict \
+-H "Content-Type: application/json" \
+-d '{"feature1": 1.0, "feature2": 2.0, "request_id": "req-001"}'
