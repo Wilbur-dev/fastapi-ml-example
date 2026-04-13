@@ -5,4 +5,4 @@ router = APIRouter()
 
 @router.get("/", name='index')
 def index():
-    return {'Welcome'}
+    return {"message": "FastAPI ML service is running"}
