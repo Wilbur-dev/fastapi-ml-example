@@ -9,7 +9,10 @@ def version(request: Request) -> VersionResult:
     runtime = service.runtime
 
     return VersionResult(
-        app_version="v1",
+        
+        app_version=runtime.app_version,
         model_version=runtime.model_version,
-        model_path=runtime.model_path,
+        model_uri=runtime.model_uri,
+        model_stage=runtime.model_stage,
+        loaded_at=runtime.loaded_at,
     )

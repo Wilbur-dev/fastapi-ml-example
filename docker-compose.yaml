@@ -9,6 +9,9 @@ services:
     volumes:
       - .:/app
     environment:
+      - MODEL_URI=${MODEL_URI}
+      - MODEL_STAGE=${MODEL_STAGE}
+      - APP_VERSION=${APP_VERSION}
       - MODEL_PATH=/app/models/lr_model.joblib
     ports:
       - "8000:8000"

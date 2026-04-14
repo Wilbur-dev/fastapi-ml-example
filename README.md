@@ -72,3 +72,16 @@ docker compose run --rm api pytest -q
 - curl -X POST http://localhost:8000/predict \
 -H "Content-Type: application/json" \
 -d '{"feature1": 1.0, "feature2": 2.0, "request_id": "req-001"}'
+
+
+
+
+
+
+```
+## 🔹 Training & Model Versioning
+
+### 1. Run training
+
+```bash
+python training/training.py --run-name lr_baseline_v1 --register-model
