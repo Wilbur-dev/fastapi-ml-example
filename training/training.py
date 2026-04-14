@@ -9,25 +9,37 @@ import mlflow.sklearn
 from pathlib import Path
 import time
 
+import argparse
+
 ROOT = Path(__file__).resolve().parent.parent
 MODEL_DIR = ROOT / "models"
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_PATH = MODEL_DIR / "lr_model.joblib"
 
 
-def train_model():
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--run-name", type=str, default="lr_baseline_v1")
+    parser.add_argument("--random-state", type=int, default=0)
+    parser.add_argument("--test-size", type=float, default=0.30)
+    parser.add_argument("--solver", type=str, default="lbfgs")
+    parser.add_argument("--register-model", action="store_true")
+    return parser.parse_args()
+
+
+def train_model(args):
     '''train LR model using generated data and log to MLflow.'''
     
     mlflow.set_experiment("fastapi-ml-example")
     
-    with mlflow.start_run(run_name="lr_baseline_v1"):
+    with mlflow.start_run(run_name=args.run_name) as run:
         # 1) 参数
         n_samples = 100
         centers = 2
         n_features = 2
-        random_state = 0
-        test_size = 0.30
-        solver = "lbfgs"
+        random_state = args.random_state
+        test_size = args.test_size
+        solver = args.solver
         
         mlflow.log_param("n_samples", n_samples)
         mlflow.log_param("centers", centers)
@@ -68,18 +80,43 @@ def train_model():
         # 5) 保存本地模型
         dump(clf, MODEL_PATH)
         logger.debug("Saved model to {}", MODEL_PATH)
+        
+        # 模型大小
+        model_size_mb = MODEL_PATH.stat().st_size / (1024 * 1024)
+        mlflow.log_metric("model_size_mb", model_size_mb)
+        
+        # 单次推理延迟
+        sample = X_test[:1]
+
+        start_pred = time.perf_counter()
+        _ = clf.predict(sample)
+        single_request_latency_ms = (time.perf_counter() - start_pred) * 1000
+        mlflow.log_metric("single_request_latency_ms", single_request_latency_ms)
+        logger.debug("model_size_mb: {}", model_size_mb)
+        logger.debug("single_request_latency_ms: {}", single_request_latency_ms)
 
         # 6) 记录 artifact
         mlflow.log_artifact(str(MODEL_PATH))
 
         # 7) 记录 MLflow model
         mlflow.sklearn.log_model(clf, artifact_path="model")
-
+        run_id = run.info.run_id
+        
+        if args.register_model:
+            model_uri = f"runs:/{run_id}/model"
+            result = mlflow.register_model(
+                model_uri=model_uri,
+                name="fastapi_ml_classifier"
+            )
+            logger.info("Registered model: name={}, version={}", result.name, result.version)
+        mlflow.log_param("logged_model_uri", f"runs:/{run_id}/model")
+        
         logger.info("MLflow run completed successfully.")
 
 
 
 if __name__ == '__main__':
     logger.debug("Training LR model")
-    train_model()
+    args = parse_args()
+    train_model(args)
 

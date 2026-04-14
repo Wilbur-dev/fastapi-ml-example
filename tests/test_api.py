@@ -44,4 +44,6 @@ def test_version():
         data = resp.json()
         assert "app_version" in data
         assert "model_version" in data
-        assert "model_path" in data
+        assert "model_uri" in data
+        assert "model_stage" in data
+        assert "loaded_at" in data
