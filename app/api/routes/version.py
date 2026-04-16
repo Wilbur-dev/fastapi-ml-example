@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Request
-from app.models.version import VersionResult
+from app.api.schemas.version import VersionResult
 
 router = APIRouter()
 

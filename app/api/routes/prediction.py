@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 
-from app.models.payloads import RequestPayload
-from app.models.prediction import PredictionResult
+from app.api.schemas.payloads import RequestPayload
+from app.api.schemas.prediction import PredictionResult
 
 router = APIRouter()
 

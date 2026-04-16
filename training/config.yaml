@@ -1,0 +1,16 @@
+experiment_name: fastapi-ml-example
+run_name: baseline-training-config-v1
+
+model_name: logistic_regression
+register_model_name: fastapi_ml_classifier
+register_model: true
+
+random_state: 42
+test_size: 0.2
+solver: liblinear
+
+artifact_path: model
+
+business_scenario: review_quality_classification
+request_schema_version: v1
+feature_schema_version: v1

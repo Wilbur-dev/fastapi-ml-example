@@ -1,16 +1,17 @@
-import os
-
 from datetime import datetime, UTC
+from app.conf.config import settings
 
 class ModelRuntime:
     def __init__(self, model, model_uri: str):
         self.model = model
         self.model_uri = model_uri
-        self.model_stage = os.getenv("MODEL_STAGE", "unknown")
-        self.app_version = os.getenv("APP_VERSION", "unknown")
+        self.model_stage = settings.model_stage
+        self.app_version = settings.app_version
         self.loaded_at = datetime.now(UTC).isoformat()
         if model_uri.startswith("models:/"):
             self.model_version = model_uri.rstrip("/").split("/")[-1]
+        elif model_uri.startswith("runs:/"):
+            self.model_version = "run-artifact"
         else:
             self.model_version = "unknown"
 

@@ -62,7 +62,6 @@ docker compose up --build
 
 ## Run Tests
 ```bash
-docker compose up --build -d
 docker compose run --rm api pytest -q
 ```
 
@@ -85,3 +84,17 @@ docker compose run --rm api pytest -q
 
 ```bash
 python training/training.py --run-name lr_baseline_v1 --register-model
+
+
+
+
+
+
+## Development workflow
+
+1. Run training with config-driven parameters.
+2. Generate `latest_model_metadata.json`.
+3. Promote the latest model URI into `.env`.
+4. Restart the API service.
+5. Verify the loaded model through `/version`.
+6. Run `scripts/check_all.sh` as a local quality gate.
