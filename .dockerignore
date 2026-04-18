@@ -1,7 +1,16 @@
 .venv
+
+# Python
 __pycache__
 *.pyc
+.pytest_cache
+
+# Git
 .git
 .gitignore
-.pytest_cache
+
+# Doc
 docs
+
+# Kubernetes
+/k8s

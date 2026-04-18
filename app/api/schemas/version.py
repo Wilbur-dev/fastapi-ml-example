@@ -5,4 +5,5 @@ class VersionResult(BaseModel):
     model_version: str
     model_uri: str
     model_stage: str
+    release_track: str
     loaded_at: str

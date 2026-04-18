@@ -12,6 +12,7 @@ class Settings:
     model_stage: str = os.getenv("MODEL_STAGE", "unknown").strip()
     log_level: str = os.getenv("LOG_LEVEL", "INFO").strip()
     request_schema_version: str = os.getenv("REQUEST_SCHEMA_VERSION", "v1").strip()
+    release_track: str = os.getenv("RELEASE_TRACK", "stable").strip()
 
 
 settings = Settings()

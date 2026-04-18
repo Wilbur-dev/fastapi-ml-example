@@ -7,13 +7,14 @@ class ModelRuntime:
         self.model_uri = model_uri
         self.model_stage = settings.model_stage
         self.app_version = settings.app_version
+        self.release_track = settings.release_track
         self.loaded_at = datetime.now(UTC).isoformat()
         if model_uri.startswith("models:/"):
             self.model_version = model_uri.rstrip("/").split("/")[-1]
         elif model_uri.startswith("runs:/"):
             self.model_version = "run-artifact"
         else:
-            self.model_version = "unknown"
+            self.model_version = "unknown-model"
 
     def predict(self, features):
         y = self.model.predict(features)[0]

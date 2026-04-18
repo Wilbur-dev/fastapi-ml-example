@@ -1,15 +1,20 @@
 FROM python:3.11-slim
 
+WORKDIR /app
+
 COPY requirements.txt /app/
-COPY app /app/app
-COPY training /app/training
-COPY models /app/models
-COPY tests /app/tests
 
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r /app/requirements.txt
 
-WORKDIR /app
+COPY app /app/app
+COPY training /app/training
+COPY models /app/models
+COPY tests /app/tests
+COPY mlruns /app/mlruns
+COPY scripts /app/scripts
+COPY artifacts /app/artifacts
+
 
 EXPOSE 8000
 

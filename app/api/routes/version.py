@@ -14,5 +14,6 @@ def version(request: Request) -> VersionResult:
         model_version=runtime.model_version,
         model_uri=runtime.model_uri,
         model_stage=runtime.model_stage,
+        release_track=runtime.release_track,
         loaded_at=runtime.loaded_at,
     )
