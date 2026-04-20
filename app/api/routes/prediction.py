@@ -25,7 +25,7 @@ def post_predict(payload: RequestPayload, request: Request):
     try:
         result = service.predict(payload)
         return PredictionResult(**result)
-
+    
     except ValueError as e: # RequestValidationError Handler already handles this
         status_bucket = "4xx"
         ERROR_COUNT.labels(
@@ -36,8 +36,8 @@ def post_predict(payload: RequestPayload, request: Request):
             release_track=release_track,
         ).inc()
         raise HTTPException(status_code=400, detail=str(e))
-
-    except Exception as e:
+    
+    except Exception:
         status_bucket = "5xx"
         ERROR_COUNT.labels(
             endpoint=endpoint,
