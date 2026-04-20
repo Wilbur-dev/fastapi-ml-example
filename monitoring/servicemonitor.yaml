@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: fastapi-ml
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: fastapi-ml
+      component: inference-api
+      track: stable
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: 15s

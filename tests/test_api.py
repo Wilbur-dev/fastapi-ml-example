@@ -95,3 +95,13 @@ def test_predict_missing_field(mock_load_model):
         }
         resp = client.post("/predict", json=payload)
         assert resp.status_code == 422
+        
+@patch("app.core.lifecycle.load_model")
+def test_metrics_endpoint_exists(mock_load_model):
+    dummy_model = DummyModel()
+    mock_load_model.return_value = (dummy_model, "models:/demo/1")
+
+    with TestClient(app) as client:
+        resp = client.get("/metrics")
+        assert resp.status_code == 200
+        assert "inference_request_total" in resp.text or "inference_latency_seconds" in resp.text

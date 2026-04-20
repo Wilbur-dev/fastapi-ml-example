@@ -17,12 +17,12 @@ spec:
       labels:
         app: fastapi-ml   # ✅ Pod 标签（必须和上面一致）
         component: inference-api
-        version: week4f
+        version: week5a
         track: stable
     spec:
       containers:
         - name: fastapi-ml   # ✅ 容器名
-          image: fastapi-ml:week4f   # ✅ 镜像名
+          image: fastapi-ml:week5a   # ✅ 镜像名
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000

@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Request
+from time import perf_counter
+from fastapi import APIRouter, Request, HTTPException
 
 from app.api.schemas.payloads import RequestPayload
 from app.api.schemas.prediction import PredictionResult
+from app.observability.metrics import REQUEST_COUNT, ERROR_COUNT, LATENCY
 
 router = APIRouter()
 
@@ -10,44 +12,57 @@ router = APIRouter()
 def post_predict(payload: RequestPayload, request: Request):
 
     service = request.app.state.inference_service
+    runtime = service.runtime
 
-    result = service.predict(payload)
+    endpoint = "/predict"
+    method = "POST"
+    model_version = runtime.model_version
+    release_track = runtime.release_track
 
-    return PredictionResult(**result)
+    start = perf_counter()
+    status_bucket = "2xx"
 
+    try:
+        result = service.predict(payload)
+        return PredictionResult(**result)
 
+    except ValueError as e: # RequestValidationError Handler already handles this
+        status_bucket = "4xx"
+        ERROR_COUNT.labels(
+            endpoint=endpoint,
+            method=method,
+            status_bucket=status_bucket,
+            model_version=model_version,
+            release_track=release_track,
+        ).inc()
+        raise HTTPException(status_code=400, detail=str(e))
 
+    except Exception as e:
+        status_bucket = "5xx"
+        ERROR_COUNT.labels(
+            endpoint=endpoint,
+            method=method,
+            status_bucket=status_bucket,
+            model_version=model_version,
+            release_track=release_track,
+        ).inc()
+        raise HTTPException(status_code=500, detail="prediction failed")
 
-'''
-from fastapi import APIRouter
+    finally:
+        elapsed = perf_counter() - start
 
-from app.models.payloads import RequestPayload
-from app.models.prediction import PredictionResult
-#from app.conf.config import MODEL_PATH
-from os import getenv
-import joblib
+        REQUEST_COUNT.labels(
+            endpoint=endpoint,
+            method=method,
+            status_bucket=status_bucket,
+            model_version=model_version,
+            release_track=release_track,
+        ).inc()
 
-
-router = APIRouter()
-
-MODEL_PATH = getenv("MODEL_PATH", "")
-
-clf = joblib.load(MODEL_PATH)
-
-
-@router.post("/predict", response_model=PredictionResult, name="predict")
-def post_predict(payload: RequestPayload = None) -> PredictionResult:
-
-    if payload is None:
-        raise ValueError("Invalid payload")
-
-    x = [[payload.feature1, payload.feature2]]
-
-    y = clf.predict(x)[0]
-    prob = clf.predict_proba(x)[0].tolist()
-
-    pred = PredictionResult(label=y, probability=prob)
-
-    return pred
-    
-'''
+        LATENCY.labels(
+            endpoint=endpoint,
+            method=method,
+            model_version=model_version,
+            release_track=release_track,
+        ).observe(elapsed)
+        
