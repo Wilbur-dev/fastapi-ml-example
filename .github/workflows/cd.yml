@@ -1,12 +1,6 @@
 name: CD
 
 on:
-  push:
-    branches:
-      - main
-      - "week*"
-      - "feature/*"
-      - "fix/*"
   workflow_dispatch:
 
 jobs:
@@ -29,15 +23,15 @@ jobs:
         with:
           version: latest
 
-      #- name: Configure kubeconfig
-      #  run: |
-      #    mkdir -p ~/.kube
-      #    echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-      #    chmod 600 ~/.kube/config
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+          chmod 600 ~/.kube/config
 
-      #- name: Verify cluster
-      #  run: |
-      #    kubectl get nodes
+      - name: Verify cluster
+        run: |
+          kubectl get nodes
 
       - name: Deploy new image
         run: |
