@@ -1,14 +1,14 @@
 {
-  "run_id": "5296e57ffd0c41e58fb6159fd4b1862c",
-  "model_uri": "runs:/5296e57ffd0c41e58fb6159fd4b1862c/model",
+  "run_id": "544f1404b4e64f58b9daf6adad257697",
+  "model_uri": "runs:/544f1404b4e64f58b9daf6adad257697/model",
   "offline_metrics": {
     "accuracy": 1.0
   },
   "serving_metrics": {
-    "single_request_latency_ms": 0.5365709999978208
+    "single_request_latency_ms": 0.27897499990103825
   },
   "chosen_reason": "Selected as latest candidate model based on current training run metrics.",
   "register_model_name": "fastapi_ml_classifier",
   "model_stage": "candidate",
-  "generated_at": "2026-04-16T11:50:26.484882+00:00"
+  "generated_at": "2026-04-21T02:53:03.386010+00:00"
 }

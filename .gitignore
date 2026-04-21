@@ -11,4 +11,7 @@ __pycache__
 *.DS_Store
 *.idea
 mlruns/
+deployment_mlruns/served_model/
+!/deployment_mlruns/.gitkeep
+!/deployment_mlruns/promotion_metadata.json
 

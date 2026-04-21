@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
-set -e
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+
+cleanup() {
+  docker compose stop api >/dev/null 2>&1 || true
+}
+trap cleanup EXIT
 
 echo "==> Running lint"
 docker compose build trainer
@@ -12,11 +19,18 @@ docker compose run --rm api pytest -q
 echo "==> Running training pipeline"
 docker compose run --rm trainer python3 -m training.training --config training/config.yaml --register-model false --random-state 123
 
-echo "==> Promoting latest model URI"
-docker compose run --rm trainer python3 scripts/promote_model.py
+echo "==> promoting model to deployment artifact"
+#docker compose run --rm trainer python3 scripts/promote_model.py
+docker compose run --rm trainer python3 scripts/promote_model.py --update-env --model-stage production
 
-echo "==> Checking promoted metadata exists"
-test -f "$(dirname "$0")/../artifacts/metadata/latest_model_metadata.json"
+echo "==> Checking metadata exists"
+test -f "$ROOT_DIR/artifacts/metadata/latest_model_metadata.json"
+
+echo "==> Checking deployment artifact exists"
+test -d "$ROOT_DIR/deployment_mlruns/served_model"
+
+echo "==> Checking promotion metadata exists"
+test -f "$ROOT_DIR/deployment_mlruns/promotion_metadata.json"
 
 echo "==> Starting API for smoke check"
 docker compose up -d api
