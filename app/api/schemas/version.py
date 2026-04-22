@@ -7,3 +7,4 @@ class VersionResult(BaseModel):
     model_stage: str
     release_track: str
     loaded_at: str
+    image_tag: str

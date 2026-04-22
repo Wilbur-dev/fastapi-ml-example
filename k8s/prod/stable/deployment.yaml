@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-ml   # ✅ Deployment 名
+  name: fastapi-ml-stable   # ✅ Deployment 名
 spec:
   replicas: 2
   strategy:
@@ -12,6 +12,8 @@ spec:
   selector:
     matchLabels:
       app: fastapi-ml   # ✅ selector 标签
+      component: inference-api
+      track: stable
   template:
     metadata:
       labels:
@@ -22,7 +24,7 @@ spec:
     spec:
       containers:
         - name: fastapi-ml   # ✅ 容器名
-          image: fastapi-ml-example:week6-day2-test   # ✅ 镜像名
+          image: fastapi-ml-example:week7-day1   # ✅ 镜像名
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -33,11 +35,13 @@ spec:
             - name: MODEL_STAGE
               value: "production"
             - name: APP_VERSION
-              value: "week6:day5"
+              value: "week7-stable-v1"
             - name: RELEASE_TRACK
               value: "stable"
             - name: MODEL_PATH
               value: "/app/models/lr_model.joblib"
+            - name: IMAGE_TAG
+              value: "stable"
             #- name: MLFLOW_TRACKING_URI
             #  value: "file:///app/mlruns"
             #- name: MLFLOW_REGISTRY_URI

@@ -13,6 +13,7 @@ class Settings:
     log_level: str = os.getenv("LOG_LEVEL", "INFO").strip()
     request_schema_version: str = os.getenv("REQUEST_SCHEMA_VERSION", "v1").strip()
     release_track: str = os.getenv("RELEASE_TRACK", "stable").strip()
+    image_tag: str = os.getenv("IMAGE_TAG", "unknown").strip()
 
 
 settings = Settings()
