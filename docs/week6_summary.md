@@ -1,3 +1,79 @@
+# ML Deployment System (Week6)
+
+## 项目简介
+
+本项目实现了一个简单的机器学习部署系统，主要包含：
+
+- FastAPI：模型服务接口
+- Docker：容器化部署
+- Kubernetes：服务编排与运行
+- GitHub Actions：CI/CD 自动化流程
+
+---
+
+## 系统架构
+
+![Architecture](docs/week6_evidence/cicd_architecture_v2.png)
+
+---
+
+## CI/CD 流程
+
+- CI：
+  - 代码检查（lint）
+  - 单元测试（pytest）
+  - 构建 Docker 镜像
+
+- CD：
+  - 自动部署到 dev 环境
+  - 使用 `kubectl set image` 更新镜像
+  - 使用 `kubectl rollout status` 检测部署状态
+  - 部署失败自动回滚（rollback）
+
+---
+
+## 多环境设计
+
+系统包含两个环境：
+
+- dev（开发环境）：自动部署
+- prod（生产环境）：手动发布
+
+---
+
+## 环境差异
+
+dev 与 prod 主要区别：
+
+- 副本数（replicas）
+- 资源限制（CPU / 内存）
+- 模型阶段（staging / production）
+- 发布轨道（dev / stable）
+
+---
+
+## 项目结构
+project/
+    app/ # FastAPI 应用
+    k8s/
+        dev/ # dev 环境配置
+        prod/ # prod 环境配置
+    .github/workflows/ # CI/CD 流水线
+    docs/ # 文档
+    README.md
+
+---
+
+## 总结
+
+当前系统已经具备：
+
+- 自动化 CI/CD 流程
+- 部署失败自动回滚能力
+- 多环境隔离（dev / prod）
+- 基础生产级部署能力
+
+
 # Week6 Day1 – CI 搭建
 
 ## 今日工作
