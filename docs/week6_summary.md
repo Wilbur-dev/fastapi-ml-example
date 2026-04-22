@@ -183,3 +183,125 @@ K8s / 服务加载
 - 当前集群为本地 minikube，GitHub-hosted runner 无法直接访问本地 Kubernetes API
 - 因此本阶段已完成 CD workflow 编写与本地部署验证
 - 真实生产环境中会使用云上 Kubernetes、self-hosted runner 或受控 kubeconfig / OIDC 实现真正自动部署
+
+
+
+# Week6 Day4 - CI/CD 故障案例 —— 模型加载失败与回滚
+## 1. 场景说明（Scenario）
+
+本实验模拟了一种由模型配置错误引发的部署失败场景。
+
+不同于使用错误镜像，这里通过人为注入错误的模型 URI：
+
+MODEL_URI=models:/not_exist/999
+
+该场景更贴近真实的 ML 系统问题：
+基础设施部署成功，但应用在启动阶段因模型加载失败而崩溃。
+
+## 2. 故障注入（Failure Injection）
+
+通过以下命令触发故障：
+
+kubectl set env deployment/fastapi-ml MODEL_URI=models:/not_exist/999
+
+更新环境变量后，Kubernetes 触发滚动更新，并尝试使用该错误配置启动新的 Pod。
+
+## 3. 现象（Symptoms）
+新 Pod 启动失败
+Pod 进入 CrashLoopBackOff 状态
+kubectl rollout status 无法成功完成
+应用日志显示模型加载失败
+
+与此同时：
+
+旧 Pod 仍然 Running 且 Ready
+服务请求仍由旧 Pod 提供（无服务中断）
+## 4. 定位（Investigation）
+
+通过以下常规排障命令进行分析：
+
+kubectl get pods
+kubectl describe pod <pod-name>
+kubectl logs <pod-name>
+kubectl rollout history deployment/fastapi-ml
+
+关键发现：
+
+新 Pod 持续重启
+容器在启动阶段加载模型失败
+Readiness 探针始终未通过
+Deployment 无法完成更新
+
+## 5. 根因（Root Cause）
+
+问题由错误的 MODEL_URI 导致：
+
+models:/not_exist/999
+
+在应用启动过程中：
+
+FastAPI 生命周期钩子（lifespan）尝试加载模型
+模型加载器抛出异常（模型不存在）
+容器启动失败
+
+最终导致：
+
+新 Pod 无法进入 Ready 状态
+滚动更新过程被阻塞
+## 6. 恢复（回滚）（Recovery / Rollback）
+
+通过以下命令进行回滚：
+
+kubectl rollout undo deployment/fastapi-ml
+
+随后验证：
+
+kubectl rollout status deployment/fastapi-ml
+
+回滚结果：
+
+旧版本 Pod 恢复为运行状态
+错误版本 Pod 被终止
+服务恢复正常
+
+## 7. 验证（Verification）
+
+回滚后执行：
+
+kubectl get pods
+kubectl rollout history deployment/fastapi-ml
+
+结果：
+
+所有 Pod 均正常运行
+Deployment 恢复到稳定版本
+## 8. 关键观察（Key Observations）
+Kubernetes 滚动更新机制能够保障服务可用性
+旧 Pod 持续提供服务
+异常 Pod 不会进入负载均衡
+故障发生在应用启动阶段（模型加载），而非基础设施层
+
+## 9. 对 CI/CD 的启示（CI/CD Implication）
+
+基于本次实验，CD 流水线应包含：
+
+kubectl rollout status --timeout=...
+
+以及自动回滚机制：
+
+kubectl rollout undo deployment/fastapi-ml
+
+从而实现：
+
+自动检测发布失败
+在出现问题时自动恢复到稳定版本
+## 10. 总结（Conclusion）
+
+本实验验证了：
+
+系统能够应对错误模型配置带来的风险
+回滚机制可以快速恢复服务
+失败检测 + 自动回滚 是生产级 ML 部署的关键能力
+
+该案例构成了 CI/CD 流水线中“可靠发布能力”的重要组成部分。
+
