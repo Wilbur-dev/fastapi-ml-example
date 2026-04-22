@@ -13,6 +13,7 @@ jobs:
 
     env:
       IMAGE_NAME: ghcr.io/wilbur-dev/fastapi-ml-example
+      NAMESPACE: dev
 
     steps:
       - name: Checkout
@@ -32,11 +33,18 @@ jobs:
       - name: Verify cluster
         run: |
           kubectl get nodes
+          kubectl get ns
+          
+      - name: Show target deployment before update
+        run: |
+          kubectl get deployment fastapi-ml -n "$NAMESPACE" -o wide || true
+
 
       - name: Deploy new image
         run: |
           kubectl set image deployment/fastapi-ml \
-            fastapi-ml=${IMAGE_NAME}:${GITHUB_SHA}
+            fastapi-ml=${IMAGE_NAME}:${GITHUB_SHA} \
+            -n "$NAMESPACE"
             
             
       - name: Rollout status with auto rollback
@@ -44,34 +52,35 @@ jobs:
           set -e
           START=$(date +%s)
 
-          if kubectl rollout status deployment/fastapi-ml --timeout=180s; then
+          if kubectl rollout status deployment/fastapi-ml -n "$NAMESPACE" --timeout=180s; then
             END=$(date +%s)
             echo "Rollout succeeded in $((END-START)) seconds"
           else
             END=$(date +%s)
             echo "Rollout failed after $((END-START)) seconds"
             echo "Rolling back to previous revision..."
-            kubectl rollout undo deployment/fastapi-ml
-            kubectl rollout status deployment/fastapi-ml --timeout=180s
+            kubectl rollout undo deployment/fastapi-ml -n "$NAMESPACE"
+            kubectl rollout status deployment/fastapi-ml -n "$NAMESPACE" --timeout=180s
             exit 1
           fi
 
 
       - name: Verify deployed image
         run: |
-          kubectl get deployment fastapi-ml -o jsonpath='{.spec.template.spec.containers[0].image}'
+          kubectl get deployment fastapi-ml -n "$NAMESPACE" \
+            -o jsonpath='{.spec.template.spec.containers[0].image}'
           echo
           
     
       
       - name: Show rollout history
         if: always()
-        run: kubectl rollout history deployment/fastapi-ml
+        run: kubectl rollout history deployment/fastapi-ml -n "$NAMESPACE"
 
       - name: Show pods
         if: always()
-        run: kubectl get pods -o wide
+        run: kubectl get pods -n "$NAMESPACE" -o wide
 
       - name: Describe deployment
         if: always()
-        run: kubectl describe deployment fastapi-ml
+        run: kubectl describe deployment fastapi-ml -n "$NAMESPACE"

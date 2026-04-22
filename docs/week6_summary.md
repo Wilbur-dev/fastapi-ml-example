@@ -305,3 +305,56 @@ kubectl rollout undo deployment/fastapi-ml
 
 该案例构成了 CI/CD 流水线中“可靠发布能力”的重要组成部分。
 
+
+
+# Week6 Day5 – 多环境部署（Dev / Prod）
+
+## 1. 概述
+
+本阶段引入环境隔离机制，避免直接将变更部署到生产环境。
+
+- **dev**：用于测试与验证  
+- **prod（default namespace）**：用于稳定服务  
+
+---
+
+## 2. Namespace 设计
+
+| 环境 | Namespace |
+|------|----------|
+| dev  | dev |
+| prod | default |
+
+---
+
+## 3. 配置差异
+
+dev 与 prod 至少存在以下三点差异：
+
+1. **副本数（Replica）**
+   - dev：1
+   - prod：2（或 3）
+
+2. **资源限制（Resources）**
+   - dev：较低的 CPU / 内存
+   - prod：更高资源，保证稳定性
+
+3. **模型阶段 / 发布轨道**
+   - dev：`MODEL_STAGE=staging`，`RELEASE_TRACK=dev`
+   - prod：`MODEL_STAGE=production`，`RELEASE_TRACK=stable`
+
+---
+
+## 4. 部署策略
+
+- CI/CD 流水线只自动部署到 **dev**
+- 生产环境采用**手动发布**
+
+dev 部署：
+```bash
+kubectl apply -n dev -f k8s/dev/
+```
+prod 部署（手动）：
+```bash
+kubectl apply -f k8s/prod/
+```

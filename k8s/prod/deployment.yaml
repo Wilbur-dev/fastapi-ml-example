@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-ml   # ✅ Deployment 名
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1   # 更新时最多允许 1 个 Pod 不可用
+      maxSurge: 1         # 更新时最多可额外多创建 1 个新 Pod
+  selector:
+    matchLabels:
+      app: fastapi-ml   # ✅ selector 标签
+  template:
+    metadata:
+      labels:
+        app: fastapi-ml   # ✅ Pod 标签（必须和上面一致）
+        component: inference-api
+        version: week6-day5
+        track: stable
+    spec:
+      containers:
+        - name: fastapi-ml   # ✅ 容器名
+          image: fastapi-ml-example:week6-day2-test   # ✅ 镜像名
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MODEL_URI
+              #value: "models:/fastapi_ml_classifier/7"
+              value: "file:///app/deployment_mlruns/served_model"
+            - name: MODEL_STAGE
+              value: "production"
+            - name: APP_VERSION
+              value: "week6:day5"
+            - name: RELEASE_TRACK
+              value: "stable"
+            - name: MODEL_PATH
+              value: "/app/models/lr_model.joblib"
+            #- name: MLFLOW_TRACKING_URI
+            #  value: "file:///app/mlruns"
+            #- name: MLFLOW_REGISTRY_URI
+            #  value: "file:///app/mlruns"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+              
+          # readinessProbe: Pod 是否“准备好接收流量”
+          # 如果失败，Pod 不会被杀掉，但不会加入 Service 后端
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          # livenessProbe: Pod 是否“仍然活着”
+          # 如果持续失败，Kubernetes 会重启容器
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
