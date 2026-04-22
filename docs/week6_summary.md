@@ -13,7 +13,7 @@
 
 ## 系统架构
 
-![Architecture](docs/week6_evidence/cicd_architecture_v2.png)
+![Architecture](week6_evidence/cicd_architecture_v2.png)
 
 ---
 
