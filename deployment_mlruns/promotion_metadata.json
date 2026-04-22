@@ -1,0 +1,20 @@
+{
+  "source_model_uri": "runs:/544f1404b4e64f58b9daf6adad257697/model",
+  "deployment_model_uri": "file:///app/deployment_mlruns/served_model",
+  "model_stage": "production",
+  "promoted_at": "2026-04-21T02:53:35.292198+00:00",
+  "source_metadata": {
+    "run_id": "544f1404b4e64f58b9daf6adad257697",
+    "model_uri": "runs:/544f1404b4e64f58b9daf6adad257697/model",
+    "offline_metrics": {
+      "accuracy": 1.0
+    },
+    "serving_metrics": {
+      "single_request_latency_ms": 0.27897499990103825
+    },
+    "chosen_reason": "Selected as latest candidate model based on current training run metrics.",
+    "register_model_name": "fastapi_ml_classifier",
+    "model_stage": "candidate",
+    "generated_at": "2026-04-21T02:53:03.386010+00:00"
+  }
+}

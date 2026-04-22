@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: fastapi-ml   # ✅ Deployment 名
 spec:
-  replicas: 2
+  replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -17,37 +17,38 @@ spec:
       labels:
         app: fastapi-ml   # ✅ Pod 标签（必须和上面一致）
         component: inference-api
-        version: week5a
-        track: stable
+        version: week6-day5
+        track: dev
     spec:
       containers:
         - name: fastapi-ml   # ✅ 容器名
-          image: fastapi-ml:week5a   # ✅ 镜像名
+          image: fastapi-ml-example:week6-day2-test   # ✅ 镜像名
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           env:
             - name: MODEL_URI
-              value: "models:/fastapi_ml_classifier/7"
+              #value: "models:/fastapi_ml_classifier/7"
+              value: "file:///app/deployment_mlruns/served_model"
             - name: MODEL_STAGE
-              value: "versioned"
+              value: "staging"
             - name: APP_VERSION
-              value: "week4:day5"
+              value: "week6:day5"
             - name: RELEASE_TRACK
-              value: "stable"
+              value: "dev"
             - name: MODEL_PATH
               value: "/app/models/lr_model.joblib"
-            - name: MLFLOW_TRACKING_URI
-              value: "file:///app/mlruns"
-            - name: MLFLOW_REGISTRY_URI
-              value: "file:///app/mlruns"
+            #- name: MLFLOW_TRACKING_URI
+            #  value: "file:///app/mlruns"
+            #- name: MLFLOW_REGISTRY_URI
+            #  value: "file:///app/mlruns"
           resources:
             requests:
-              cpu: "250m"
-              memory: "256Mi"
+              cpu: "100m"
+              memory: "128Mi"
             limits:
-              cpu: "500m"
-              memory: "512Mi"
+              cpu: "200m"
+              memory: "256Mi"
               
           # readinessProbe: Pod 是否“准备好接收流量”
           # 如果失败，Pod 不会被杀掉，但不会加入 Service 后端
