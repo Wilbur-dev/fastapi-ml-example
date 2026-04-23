@@ -24,7 +24,7 @@ spec:
     spec:
       containers:
         - name: fastapi-ml   # ✅ 容器名
-          image: fastapi-ml-example:week7-day1   # ✅ 镜像名
+          image: fastapi-ml-example:week7c   # ✅ 镜像名
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -42,6 +42,8 @@ spec:
               value: "/app/models/lr_model.joblib"
             - name: IMAGE_TAG
               value: "stable"
+            - name: MODEL_VERSION
+              value: "stable-model-v1"
             #- name: MLFLOW_TRACKING_URI
             #  value: "file:///app/mlruns"
             #- name: MLFLOW_REGISTRY_URI

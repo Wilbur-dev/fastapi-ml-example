@@ -4,7 +4,7 @@ metadata:
   name: fastapi-ml-canary
   annotations:
     nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "10"
+    nginx.ingress.kubernetes.io/canary-weight: "50"
 spec:
   rules:
     - host: fastapi-ml.local

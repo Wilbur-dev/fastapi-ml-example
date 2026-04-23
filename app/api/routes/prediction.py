@@ -4,6 +4,7 @@ from fastapi import APIRouter, Request, HTTPException
 from app.api.schemas.payloads import RequestPayload
 from app.api.schemas.prediction import PredictionResult
 from app.observability.metrics import REQUEST_COUNT, ERROR_COUNT, LATENCY
+from loguru import logger
 
 router = APIRouter()
 
@@ -65,4 +66,15 @@ def post_predict(payload: RequestPayload, request: Request):
             model_version=model_version,
             release_track=release_track,
         ).observe(elapsed)
+        
+        logger.info(
+            "predict request_id={} endpoint={} method={} status_bucket={} model_version={} release_track={} latency_ms={:.2f}",
+            payload.request_id,
+            endpoint,
+            method,
+            status_bucket,
+            model_version,
+            release_track,
+            elapsed * 1000,
+        )
         
