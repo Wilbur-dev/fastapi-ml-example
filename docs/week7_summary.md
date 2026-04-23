@@ -211,3 +211,153 @@
 - 发布不是一次切换，而是逐步放量过程
 - 请求量、错误率和延迟是灰度决策的核心指标
 - release_track 维度使 stable / canary 的对比更清晰
+
+
+
+# Week7 Day6 - Canary Rollback 演练总结
+
+## 一、背景（Background）
+
+在完成 stable / canary 双版本部署和流量分配后，本次实验的目标是验证：
+
+> 当 canary 版本表现异常时，系统是否能够**快速、安全地回退流量**，恢复稳定服务。
+
+本次演练重点不在部署，而在**发布风险控制能力**。
+
+---
+
+## 二、实验设计（Experiment Design）
+
+为了模拟 canary 异常，本次在 canary 版本中人为引入延迟：
+
+```python
+if runtime.release_track == "canary":
+    time.sleep(0.3)
+```
+    
+该修改仅影响 canary，不影响 stable，从而构造对照实验。
+
+流量分配：
+
+stable：约 50%
+canary：约 50%
+
+## 三、回退前状态（Before Rollback）
+1. Ingress 状态
+kubectl get ingress
+kubectl describe ingress fastapi-ml-canary
+
+确认：
+
+canary ingress 存在
+已配置流量权重（如 50%）
+
+
+2. 服务行为
+·/predict 请求同时命中：
+stable
+canary
+·日志中同时出现：
+release_track=stable
+release_track=canary
+
+## 四、问题观测（Issue Observation）
+
+通过压测触发流量：
+
+hey -n 20000 -c 50 ...
+
+观察到：
+
+canary 延迟显著高于 stable
+error rate 正常（未报错）
+返回格式保持一致
+判定结果：
+
+根据发布标准：
+
+❌ p95 超出阈值（> stable +20%）
+❌ 不满足上线条件
+
+👉 判定 canary 版本不可继续放量
+
+## 五、回退操作（Rollback Action）
+
+执行流量级回退：
+
+kubectl delete -f k8s/prod/canary/ingress.yaml
+
+说明：
+不删除 pod
+不修改 deployment
+仅移除流量入口
+
+## 六、回退后验证（After Rollback）
+1. Ingress 状态
+kubectl get ingress
+
+结果：
+
+仅剩 stable ingress
+canary ingress 已删除
+
+2. 日志验证
+kubectl logs deployment/fastapi-ml-canary -f
+
+观察：
+canary：仅剩 /health 和 /metrics
+
+👉 说明：
+
+业务流量已完全移出 canary
+仅保留系统探针请求
+
+3. 监控验证（Grafana）
+canary 流量归零
+p95 恢复正常
+所有请求回到 stable
+
+## 七、实验结论（Conclusion）
+
+本次演练验证了系统具备：
+
+✅ 1. 灰度发布能力
+stable / canary 共存
+流量可控分配
+✅ 2. 风险识别能力
+通过 p95 延迟识别异常版本
+✅ 3. 快速回退能力（核心）
+通过移除 ingress 实现流量回退
+无需重启服务或回滚镜像
+✅ 4. 系统稳定性保障
+回退后服务立即恢复正常
+
+
+八、关键经验（Key Takeaways）
+1️⃣ 流量回退优先于版本回退
+
+在生产环境中：
+
+优先切流量，而不是先 rollback deployment
+
+原因：
+
+更快（秒级）
+更安全（不影响运行中的 pod）
+更符合线上应急流程
+2️⃣ 指标驱动发布决策
+
+灰度发布不能依赖主观判断，必须基于：
+
+latency（p95）
+error rate
+response compatibility
+3️⃣ 可观测性是灰度发布的基础
+
+本次实验依赖：
+
+Prometheus 指标
+Grafana 可视化
+日志中的 release_track
+
+👉 没有这些，无法判断是否回退

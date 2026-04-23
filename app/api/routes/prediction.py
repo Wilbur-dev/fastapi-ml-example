@@ -6,6 +6,7 @@ from app.api.schemas.prediction import PredictionResult
 from app.observability.metrics import REQUEST_COUNT, ERROR_COUNT, LATENCY
 from loguru import logger
 
+
 router = APIRouter()
 
 
@@ -22,7 +23,7 @@ def post_predict(payload: RequestPayload, request: Request):
 
     start = perf_counter()
     status_bucket = "2xx"
-
+        
     try:
         result = service.predict(payload)
         return PredictionResult(**result)
