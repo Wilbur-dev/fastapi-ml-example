@@ -45,50 +45,55 @@ python training/training.py \
 ```
 实现：
 
-同一脚本支持多实验
-实验结果可对比
+- 同一脚本支持多实验
+- 实验结果可对比
+
 ### 3️⃣ MLflow Model Logging
 
 使用：
 
-mlflow.sklearn.log_model(model, "model")
+`mlflow.sklearn.log_model(model, "model")`
 
 实现：
 
-模型作为 artifact 存储
-可通过 runs:/... 或 registry 加载
+- 模型作为 artifact 存储
+- 可通过 runs:/... 或 registry 加载
+
 ### 4️⃣ Model Registry 接入（关键）
 
 使用：
 
-mlflow.register_model(model_uri, "fastapi_ml_classifier")
+`mlflow.register_model(model_uri, "fastapi_ml_classifier")`
 
 实现：
 
-同一模型名下多版本管理：
-Version 2
-Version 3
-支持模型生命周期管理
+- 同一模型名下多版本管理：
+    - Version 2
+    - Version 3
+- 支持模型生命周期管理
+
 ### 5️⃣ 服务按模型版本加载（核心能力）
 
 通过 .env 控制模型版本：
-
+```bash
 MODEL_URI=models:/fastapi_ml_classifier/2
 MODEL_STAGE=versioned
 APP_VERSION=week2
+```
 
 API 启动时加载：
 
-mlflow.sklearn.load_model(MODEL_URI)
+`mlflow.sklearn.load_model(MODEL_URI)`
 
 实现：
 
-不改代码即可切换模型
-训练与部署解耦
+- 不改代码即可切换模型
+- 训练与部署解耦
+
 ### 6️⃣ /version 接口增强
 
 返回当前服务加载模型信息：
-
+```JSON
 {
   "app_version": "week2",
   "model_uri": "models:/fastapi_ml_classifier/2",
@@ -96,11 +101,12 @@ mlflow.sklearn.load_model(MODEL_URI)
   "model_stage": "versioned",
   "loaded_at": "2026-04-13T..."
 }
+```
 
 作用：
 
-验证当前线上模型
-支持后续灰度发布 / 回滚
+- 验证当前线上模型
+- 支持后续灰度发布 / 回滚
 
 ### 小结
 

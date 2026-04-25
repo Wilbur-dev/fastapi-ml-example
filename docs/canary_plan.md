@@ -1,8 +1,8 @@
 # 🧠 Canary 部署方案
 
-## 1️⃣ 实验目标
+## 1️⃣ 测试目标
 
-本实验的目标是：
+本次测试的目标是：
 
 - 通过**Canary（灰度发布）策略**安全上线新模型版本
 - 在逐步放量过程中验证系统表现
@@ -66,7 +66,7 @@ nginx.ingress.kubernetes.io/canary-weight: X
 
 ### 3.2 回退方法
 
-本实验采用：
+本次测试采用：
 
 ✅ 删除 Canary Ingress
 ```bash

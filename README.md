@@ -65,7 +65,7 @@
             │ GitHub Actions   │
             │ CI (build/push)  │
             └──────────────────┘
-```text
+```
 
 系统整体流程：
 
@@ -210,6 +210,9 @@ GET /version
 - Grafana 展示 QPS / p95 latency
 - HPA 根据 CPU 自动扩缩容
 
+👉 查看压测与扩缩容报告：
+[压测与扩缩容报告](docs/benchmark.md)
+
 ---
 
 
@@ -228,13 +231,18 @@ GET /version
 - 基于 error rate 和 latency 判断是否继续放量
 - 指标异常时回滚至 stable
 
+👉 查看计划与报告：
+[灰度计划](docs/canary_plan.md)
+
+[灰度报告](docs/canary_report.md)
+
 ---
 
 ## 12. 项目结果（Results）
 
 👉 查看详细截图与结果：
 
-[docs/results.md](docs/results.md)
+[项目结果](docs/results.md)
 
 ---
 

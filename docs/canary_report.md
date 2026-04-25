@@ -1,12 +1,12 @@
-# 📊 Canary + 回退实验报告
+# 📊 Canary + 回退测试报告
 
 ## 1️⃣ 灰度流量验证（50%阶段）
-📌 实验命令
+📌 测试命令
 ```bash
 kubectl logs fastapi-ml-stable-xxx | grep request_id | wc -l
 kubectl logs fastapi-ml-canary-xxx | grep request_id | wc -l
 ```
-📌 实验结果
+📌 测试结果
 - stable ≈ 140+
 - canary ≈ 150+
 
@@ -41,7 +41,7 @@ if runtime.release_track == "canary":
 ```
 
 🔴 延迟指标差异分析
-在本实验中，观察到以下现象：
+在本次测试中，观察到以下现象：
 
 - hey 压测结果显示：
 	- 平均延迟 ≈ 138 ms
@@ -51,9 +51,9 @@ if runtime.release_track == "canary":
 	- p95 延迟 ≈ 480 ms
 
 两者存在明显差异，其原因如下：
-在实验中对比 hey 与 Grafana 的 p95 延迟发现存在差异：hey 的 p95 约为 311ms，而 Grafana 显示约为 480ms。该差异主要来源于统计方式不同。hey 的 p95 基于单次压测的真实请求分布，而 Grafana 的 p95 是通过 Prometheus histogram_quantile 估算得到，会受到分桶（bucket）离散化影响。
+在测试中对比 hey 与 Grafana 的 p95 延迟发现存在差异：hey 的 p95 约为 311ms，而 Grafana 显示约为 480ms。该差异主要来源于统计方式不同。hey 的 p95 基于单次压测的真实请求分布，而 Grafana 的 p95 是通过 Prometheus histogram_quantile 估算得到，会受到分桶（bucket）离散化影响。
 
-在本实验的 canary 场景中，请求延迟呈现出明显的双峰偏态分布：一部分请求（stable）集中在较低延迟区间，而另一部分请求（canary）由于人为引入延迟，集中在约 300–350ms 区间。这种分布在 bucket 之间存在“断层”（即中间区间样本较少），导致 histogram_quantile 在计算 p95 时需要在较大区间内进行线性插值。
+在本次测试的 canary 场景中，请求延迟呈现出明显的双峰偏态分布：一部分请求（stable）集中在较低延迟区间，而另一部分请求（canary）由于人为引入延迟，集中在约 300–350ms 区间。这种分布在 bucket 之间存在“断层”（即中间区间样本较少），导致 histogram_quantile 在计算 p95 时需要在较大区间内进行线性插值。
 
 例如，约 350ms 的请求可能被归入 0.5s bucket，从而使 p95 被系统性向上估计，接近 bucket 上界（≈480–500ms）。这种偏差并非随机波动，而是由分桶机制带来的稳定高估（systematic bias）。
 
@@ -140,7 +140,7 @@ QPS ≈ 250 req/s
 
 ---
 
-## 🎯 7️⃣ 实验总结
+## 🎯 7️⃣ 测试总结
 1. 成功实现 Canary 灰度发布
 2. 通过监控识别性能问题
 3. 成功执行回退并验证系统恢复

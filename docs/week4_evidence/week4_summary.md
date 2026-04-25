@@ -29,6 +29,7 @@
 - Failure simulation and recovery
 
 ## Architecture
+```text
 ┌──────────────┐
 │ User / curl  │
 └──────┬───────┘
@@ -64,15 +65,17 @@
         ┌──────────────┐
         │ ML Model     │
         └──────────────┘
-
+```
 
 # Week4 Day1 - K8s Setup
 
 ## Commands
+```bash
 minikube start --driver=docker
 kubectl get nodes
 kubectl create deployment demo-nginx --image=nginx
 kubectl port-forward deployment/demo-nginx 8080:80
+```
 
 ## Result
 - Cluster started successfully
@@ -84,11 +87,13 @@ kubectl port-forward deployment/demo-nginx 8080:80
 # Week4 Day2 - Deploy API Image to Kubernetes
 
 ## Commands
+```bash
 docker build -t fastapi-ml:week4b .
 minikube image load fastapi-ml:week4b
 kubectl apply -f k8s/deployment.yaml
 kubectl get pods -w
 kubectl get deployment
+```
 
 ## Result
 - API image was built successfully
@@ -109,12 +114,14 @@ kubectl get deployment
 # Week4 Day3 - Service Exposure
 
 ## Commands
+```bash
 kubectl apply -f k8s/service.yaml
 kubectl get svc
 kubectl describe svc fastapi-ml
 kubectl port-forward svc/fastapi-ml 8000:8000
 curl http://127.0.0.1:8000/health
 curl -X POST http://127.0.0.1:8000/predict -H "Content-Type: application/json" -d '...'
+```
 
 ## Result
 - Service created successfully
@@ -190,33 +197,42 @@ kubectl describe pod <pod>
 ```
 Key findings:
 
-Liveness probe failed: HTTP 500
-Readiness probe failed
-Container repeatedly restarted
+- Liveness probe failed: HTTP 500
+- Readiness probe failed
+- Container repeatedly restarted
+
 ###3️⃣ 原因（Root Cause）
 
 /health endpoint returned HTTP 500, causing:
 
-Readiness probe failure → Pod not ready
-Liveness probe failure → container restart loop
+- Readiness probe failure → Pod not ready
+- Liveness probe failure → container restart loop
+
 ###4️⃣ 恢复（Fix）
+```text
 Restored /health endpoint to return HTTP 200
+```
 or
+
+```bash
 kubectl rollout undo deployment/fastapi-ml
+```
+
 ###5️⃣ 结果（Result）
 
-Pod returned to Running (1/1)
-RESTARTS stopped increasing
-Service recovered successfully
+- Pod returned to Running (1/1)
+- RESTARTS stopped increasing
+- Service recovered successfully
 
 ##Case 2: Missing Configuration (MODEL_URI / MODEL_PATH removed)
-###1️⃣ 现象（Symptoms）
 
-Pod failed to become ready (0/1)
-Application failed to start properly
-Eventually entered restart loop / CrashLoopBackOff
+### 1️⃣ 现象（Symptoms）
 
-###2️⃣ 定位（Investigation）
+- Pod failed to become ready (0/1)
+- Application failed to start properly
+- Eventually entered restart loop / CrashLoopBackOff
+
+### 2️⃣ 定位（Investigation）
 ```
 kubectl get pods
 kubectl logs <pod>
@@ -224,24 +240,32 @@ kubectl describe pod <pod>
 ````
 Key findings:
 
-Application startup errors in logs
-Model loading failure
-Probe failures following initialization failure
-###3️⃣ 原因（Root Cause）
+- Application startup errors in logs
+- Model loading failure
+- Probe failures following initialization failure
+
+### 3️⃣ 原因（Root Cause）
 
 Required environment variables (MODEL_URI, MODEL_PATH) were missing, leading to:
 
-Model initialization failure
-Application not functioning correctly
-Health check failure → probe failure
-###4️⃣ 恢复（Fix）
-Restored environment variables in deployment.yaml
-or
-kubectl rollout undo deployment/fastapi-ml --to-revision=8
-###5️⃣ 结果（Result）
+- Model initialization failure
+- Application not functioning correctly
+- Health check failure → probe failure
 
-Application initialized successfully
-Pod reached Running (1/1)
-Service resumed normal operation
+### 4️⃣ 恢复（Fix）
+```text
+Restored environment variables in deployment.yaml
+```
+or
+
+```bash
+kubectl rollout undo deployment/fastapi-ml --to-revision=8
+```
+
+### 5️⃣ 结果（Result）
+
+- Application initialized successfully
+- Pod reached Running (1/1)
+- Service resumed normal operation
 
 

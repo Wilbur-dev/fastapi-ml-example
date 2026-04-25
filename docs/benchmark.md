@@ -1,6 +1,6 @@
-# Performance Benchmark
+# 性能压测报告
 
-## Test Setup
+## 测试环境配置
 
 - Tool: hey
 - Endpoint: /predict
@@ -9,9 +9,9 @@
 
 ---
 
-## Load Test Results
+## 压测结果
 
-### Low Concurrency
+### 低并发测试
 
 ![low](week5_evidence/压测/低并发压测.png)
 
@@ -22,7 +22,7 @@
 
 ---
 
-### Medium Concurrency
+### 中等并发测试
 
 ![mid](week5_evidence/压测/中等并发压测.png)
 
@@ -33,7 +33,7 @@
 
 ---
 
-### High Concurrency
+### 高并发测试
 
 ![high](week5_evidence/压测/高并发压测.png)
 
@@ -44,9 +44,9 @@
 
 ---
 
-## Metrics Observation (Grafana)
+## 监控指标分析（Grafana）
 
-### P95 Latency
+### P95 延迟
 
 ![latency](week5_evidence/压测/P95Latency.png)
 
@@ -55,7 +55,7 @@
 
 ---
 
-### CPU Usage
+### CPU 使用率
 
 ![cpu](week5_evidence/压测/PodCPU.png)
 
@@ -64,7 +64,7 @@
 
 ---
 
-### QPS
+### 请求吞吐量（QPS）
 
 ![qps](week5_evidence/压测/QPS.png)
 
@@ -73,7 +73,7 @@
 
 ---
 
-## Observations
+## 结果分析
 
 - 系统在低到中等并发下运行稳定
 - 随着并发增加，延迟逐步上升（符合预期）
@@ -82,7 +82,7 @@
 
 ---
 
-## Limitations
+## 测试局限性
 
 - 测试基于本地 Kubernetes 环境（minikube），不代表生产环境性能
 - 并发规模有限（未进行大规模压力测试）
@@ -90,7 +90,7 @@
 
 ---
 
-## Conclusion
+## 结论
 
 该系统在中等负载下能够稳定运行，并具备基础的性能扩展能力。
 
@@ -98,9 +98,9 @@
 
 
 
-## Autoscaling Behavior (HPA)
+## 自动扩缩容行为（HPA）
 
-### Pod Scaling
+### Pod扩缩容情况
 
 ![pod_count](week5_evidence/HPA扩缩容/PodCount.png)
 
@@ -112,7 +112,7 @@
 
 ---
 
-### HPA Status
+### HPA状态
 
 ![hpa](week5_evidence/HPA扩缩容/HPA.png)
 
@@ -122,7 +122,7 @@
 
 ---
 
-### Pod Lifecycle
+### Pod生命周期
 
 ![pods](week5_evidence/HPA扩缩容/Pods.png)
 
@@ -132,7 +132,7 @@
 
 ---
 
-### Metrics Correlation
+### 指标关联分析
 
 - QPS 上升 → CPU 使用率上升  
 - CPU 超过 50% → HPA 触发扩容  
@@ -140,7 +140,7 @@
 
 ---
 
-## Impact of Autoscaling
+## 扩缩容影响分析
 
 | Scenario   | Pods | P95 Latency | CPU |
 |------------|------|-------------|-----|
@@ -149,13 +149,13 @@
 
 ---
 
-### Observation
+### 现象说明
 
 扩容后系统延迟明显下降，说明增加副本有效提升了处理能力。
 
 ---
 
-### Observations
+### 综合分析
 
 - 系统在负载增加时能够自动扩容（2 → 4 Pods）
 - 扩容过程中系统保持稳定（无错误请求）
@@ -164,7 +164,7 @@
 
 ---
 
-### Limitations
+### 测试局限性
 
 - 扩容存在一定延迟（Pod 启动时间）
 - HPA 仅基于 CPU 指标，未考虑业务指标（如延迟）
@@ -172,7 +172,7 @@
 
 ---
 
-### Conclusion
+### 结论
 
 系统成功实现了基于 CPU 的自动扩缩容机制。
 
