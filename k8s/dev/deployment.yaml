@@ -1,34 +1,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fastapi-ml   # ✅ Deployment 名
+  name: fastapi-ml   
 spec:
   replicas: 1
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 1   # 更新时最多允许 1 个 Pod 不可用
-      maxSurge: 1         # 更新时最多可额外多创建 1 个新 Pod
+      maxUnavailable: 1   
+      maxSurge: 1         
   selector:
     matchLabels:
-      app: fastapi-ml   # ✅ selector 标签
+      app: fastapi-ml   
   template:
     metadata:
       labels:
-        app: fastapi-ml   # ✅ Pod 标签（必须和上面一致）
+        app: fastapi-ml   
         component: inference-api
         version: week8
         track: dev
     spec:
       containers:
-        - name: fastapi-ml   # ✅ 容器名
-          image: fastapi-ml-example:week8   # ✅ 镜像名
+        - name: fastapi-ml   
+          image: fastapi-ml-example:week8  
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
           env:
             - name: MODEL_URI
-              #value: "models:/fastapi_ml_classifier/7"
               value: "file:///app/deployment_mlruns/served_model"
             - name: MODEL_STAGE
               value: "staging"
@@ -42,10 +41,6 @@ spec:
               value: "dev"
             - name: MODEL_VERSION
               value: "dev"
-            #- name: MLFLOW_TRACKING_URI
-            #  value: "file:///app/mlruns"
-            #- name: MLFLOW_REGISTRY_URI
-            #  value: "file:///app/mlruns"
           resources:
             requests:
               cpu: "100m"
@@ -54,8 +49,6 @@ spec:
               cpu: "200m"
               memory: "256Mi"
               
-          # readinessProbe: Pod 是否“准备好接收流量”
-          # 如果失败，Pod 不会被杀掉，但不会加入 Service 后端
           readinessProbe:
             httpGet:
               path: /health
@@ -65,8 +58,6 @@ spec:
             timeoutSeconds: 2
             failureThreshold: 3
 
-          # livenessProbe: Pod 是否“仍然活着”
-          # 如果持续失败，Kubernetes 会重启容器
           livenessProbe:
             httpGet:
               path: /health

@@ -20,7 +20,6 @@ echo "==> Running training pipeline"
 docker compose run --rm trainer python3 -m training.training --config training/config.yaml --register-model false --random-state 123
 
 echo "==> promoting model to deployment artifact"
-#docker compose run --rm trainer python3 scripts/promote_model.py
 docker compose run --rm trainer python3 scripts/promote_model.py --update-env --model-stage production
 
 echo "==> Checking metadata exists"
