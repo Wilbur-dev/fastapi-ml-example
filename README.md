@@ -345,6 +345,19 @@ fastapi-ml-example/
 	- 云原生部署（EKS / GKE）
 	- 基于业务指标的自动扩缩容
 	- 更复杂的模型与推理优化（ONNX / batching）
+	
+---
+	
+## 致谢与贡献说明（Acknowledgement & Contributions）
+
+本项目最初参考了一个简单的 FastAPI 推理服务示例：
+https://github.com/pashaolu/fastapi-ml-example
+
+原始项目仅提供基础的模型推理接口。
+
+在此基础上，我对系统进行了重构与扩展，实现了基于 MLflow 的模型版本管理与加载机制，以及 Kubernetes 部署、监控、自动扩缩容、灰度发布及回退机制等功能。
+
+项目中的系统设计、系统验证与性能分析均为独立完成。
 
 
 
