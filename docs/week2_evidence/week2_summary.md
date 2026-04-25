@@ -42,12 +42,12 @@ python training/training.py \
   --test-size 0.3 \
   --solver lbfgs \
   --register-model
-
+```
 实现：
 
 同一脚本支持多实验
 实验结果可对比
-3️⃣ MLflow Model Logging
+### 3️⃣ MLflow Model Logging
 
 使用：
 
@@ -57,7 +57,7 @@ mlflow.sklearn.log_model(model, "model")
 
 模型作为 artifact 存储
 可通过 runs:/... 或 registry 加载
-4️⃣ Model Registry 接入（关键）
+### 4️⃣ Model Registry 接入（关键）
 
 使用：
 
@@ -69,7 +69,7 @@ mlflow.register_model(model_uri, "fastapi_ml_classifier")
 Version 2
 Version 3
 支持模型生命周期管理
-5️⃣ 服务按模型版本加载（核心能力）
+### 5️⃣ 服务按模型版本加载（核心能力）
 
 通过 .env 控制模型版本：
 
@@ -85,7 +85,7 @@ mlflow.sklearn.load_model(MODEL_URI)
 
 不改代码即可切换模型
 训练与部署解耦
-6️⃣ /version 接口增强
+### 6️⃣ /version 接口增强
 
 返回当前服务加载模型信息：
 

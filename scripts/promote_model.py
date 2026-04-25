@@ -50,7 +50,6 @@ def parse_args() -> argparse.Namespace:
         help="Also update local .env with deployment MODEL_URI",
     )
     return parser.parse_args()
-    return parser.parse_args()
 
 
 def load_metadata(metadata_path: Path) -> dict:

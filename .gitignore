@@ -1,5 +1,6 @@
 .python-version
 __pycache__
+.ruff_cache/
 *.pyc
 .venv
 *.egg-info*
@@ -8,7 +9,11 @@ __pycache__
 *.mypy_cache
 .python-version
 *.pkl
+
+# macOS
 *.DS_Store
+__MACOSX/
+
 *.idea
 mlruns/
 deployment_mlruns/served_model/

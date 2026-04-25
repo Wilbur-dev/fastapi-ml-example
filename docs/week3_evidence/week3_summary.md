@@ -21,9 +21,12 @@
 
   * 固定随机种子（reproducibility）
   * 可配置训练参数（如是否注册模型等）
-* 使用 MLflow 统一记录实验（生成 `runs:/...`）
+  * 使用 MLflow 统一记录实验（生成 `runs:/...`）
 
 👉 实现了基础的**可复现训练流程**
+![Training_Output](训练输出.png)
+![Predict_Result](predict_result.png)
+![Version_Result](version_result.png)
 
 ---
 
@@ -34,7 +37,7 @@
 ```text
 artifacts/metadata/latest_model_metadata.json
 ```
-
+![Latest_Model_Metadata](latest_model_metadata.png)
 包含信息：
 
 * `run_id`
@@ -129,6 +132,7 @@ lint → test → train → promote → serve → smoke test
 * 使用 `trap` 实现自动清理容器
 
 👉 相当于一个**本地 CI 流水线（Local CI Pipeline）**
+![Check_All](bash_scripts_check_all_output.png)
 
 ---
 

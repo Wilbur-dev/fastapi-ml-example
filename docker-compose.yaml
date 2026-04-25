@@ -13,6 +13,9 @@ services:
       - MODEL_STAGE=${MODEL_STAGE}
       - APP_VERSION=${APP_VERSION}
       - MODEL_PATH=/app/models/lr_model.joblib
+      - RELEASE_TRACK=${RELEASE_TRACK} 
+      - IMAGE_TAG=${IMAGE_TAG}
+      - MODEL_VERSION=${MODEL_VERSION}
     ports:
       - "8000:8000"
     networks:
