@@ -50,7 +50,6 @@ def parse_args() -> argparse.Namespace:
         help="Also update local .env with deployment MODEL_URI",
     )
     return parser.parse_args()
-    return parser.parse_args()
 
 
 def load_metadata(metadata_path: Path) -> dict:
@@ -156,8 +155,6 @@ def main() -> None:
         print(f"Updated .env at: {ENV_PATH}")
 
     
-    #print(f"Promoted MODEL_URI -> {model_uri}")
-    #print(f"Updated .env at: {ENV_PATH}")
     print(f"Promoted source model -> {source_model_uri}")
     print(f"Deployment MODEL_URI -> {DEPLOYMENT_MODEL_URI}")
     print(f"Promotion metadata -> {PROMOTION_METADATA_PATH}")

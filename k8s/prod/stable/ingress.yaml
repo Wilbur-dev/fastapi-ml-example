@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fastapi-ml-stable
+spec:
+  rules:
+    - host: fastapi-ml.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: fastapi-ml-stable
+                port:
+                  number: 8000

@@ -9,7 +9,12 @@ class ModelRuntime:
         self.app_version = settings.app_version
         self.release_track = settings.release_track
         self.loaded_at = datetime.now(UTC).isoformat()
-        if model_uri.startswith("models:/"):
+        self.image_tag = settings.image_tag
+        if settings.model_version:
+            self.model_version = settings.model_version
+        elif model_uri.startswith("file:/"):
+            self.model_version = "run-loaded-model"
+        elif model_uri.startswith("models:/"):
             self.model_version = model_uri.rstrip("/").split("/")[-1]
         elif model_uri.startswith("runs:/"):
             self.model_version = "run-artifact"

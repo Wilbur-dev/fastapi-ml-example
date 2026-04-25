@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi-ml-canary   
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1  
+      maxSurge: 1         
+  selector:
+    matchLabels:
+      app: fastapi-ml   
+      component: inference-api
+      track: canary
+  template:
+    metadata:
+      labels:
+        app: fastapi-ml   
+        component: inference-api
+        version: week8-canary
+        track: canary
+    spec:
+      containers:
+        - name: fastapi-ml  
+          image: fastapi-ml-example:week8   
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          env:
+            - name: MODEL_URI
+              value: "file:///app/deployment_mlruns/served_model"
+            - name: MODEL_STAGE
+              value: "production"
+            - name: APP_VERSION
+              value: "week8-canary"
+            - name: RELEASE_TRACK
+              value: "canary"
+            - name: MODEL_PATH
+              value: "/app/models/lr_model.joblib"
+            - name: IMAGE_TAG
+              value: "canary"
+            - name: MODEL_VERSION
+              value: "canary-model-v1"
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+              
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
