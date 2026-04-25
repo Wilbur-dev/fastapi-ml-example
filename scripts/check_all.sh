@@ -34,11 +34,6 @@ test -f "$ROOT_DIR/deployment_mlruns/promotion_metadata.json"
 echo "==> Starting API for smoke check"
 docker compose up -d api
 
-cleanup() {
-  docker compose stop api >/dev/null 2>&1 || true
-}
-trap cleanup EXIT
-
 sleep 15
 
 echo "==> Checking /health"
