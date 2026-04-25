@@ -10,7 +10,7 @@ kubectl logs fastapi-ml-canary-xxx | grep request_id | wc -l
 - stable ≈ 140+
 - canary ≈ 150+
 
-![日志统计](week7_evidence/day5_30%-50%灰度evidence/50%/log_statistics.png)
+![日志统计](week7_evidence/day5_30pct-50pct灰度evidence/50pct/log_statistics.png)
 
 ✅ 结论
 - Canary 流量约占 50%，符合 ingress 配置。
@@ -51,7 +51,15 @@ if runtime.release_track == "canary":
 	- p95 延迟 ≈ 480 ms
 
 两者存在明显差异，其原因如下：
-在实验中对比 hey 与 Grafana 的 p95 延迟发现存在差异：hey 的 p95 约为 311ms，而 Grafana 显示约为 480ms。该差异主要来源于统计方式不同。hey 的 p95 基于单次压测的真实请求分布，而 Grafana 的 p95 是通过 Prometheus histogram_quantile 估算得到，会受到分桶（bucket）离散化影响，例如约 350ms 的请求可能被归入 0.5s bucket，从而被向上估计。此外，Grafana 的指标基于时间窗口（如 rate[1m]）聚合，可能包含抖动和极端值。因此 Grafana 的 p95 通常略高，更偏向反映系统的尾延迟上界，而 hey 更接近实际请求分布。
+在实验中对比 hey 与 Grafana 的 p95 延迟发现存在差异：hey 的 p95 约为 311ms，而 Grafana 显示约为 480ms。该差异主要来源于统计方式不同。hey 的 p95 基于单次压测的真实请求分布，而 Grafana 的 p95 是通过 Prometheus histogram_quantile 估算得到，会受到分桶（bucket）离散化影响。
+
+在本实验的 canary 场景中，请求延迟呈现出明显的双峰偏态分布：一部分请求（stable）集中在较低延迟区间，而另一部分请求（canary）由于人为引入延迟，集中在约 300–350ms 区间。这种分布在 bucket 之间存在“断层”（即中间区间样本较少），导致 histogram_quantile 在计算 p95 时需要在较大区间内进行线性插值。
+
+例如，约 350ms 的请求可能被归入 0.5s bucket，从而使 p95 被系统性向上估计，接近 bucket 上界（≈480–500ms）。这种偏差并非随机波动，而是由分桶机制带来的稳定高估（systematic bias）。
+
+此外，Grafana 的指标基于时间窗口（如 rate[1m]）聚合，在低流量或流量分布不均的 canary 场景下，更容易受到分布不稳定的影响，进一步放大该偏差。
+
+因此，Grafana 的 p95 通常略高，更偏向反映系统尾延迟的上界，而 hey 直接基于原始样本计算分位数，更接近真实请求分布。
 
 ---
 
@@ -87,6 +95,7 @@ curl http://fastapi-ml.local/version
 	- /health
 	- /metrics
 - 没有 /predict
+
 ✅ 结论
 - 回退后 canary 已不再接收业务流量。
 
@@ -118,10 +127,11 @@ QPS ≈ 250 req/s
 ---
 
 ## 🔥 6️⃣ 回退前后对比
-指标		|	回退前			|	回退后
-Avg 	|	延迟	138 ms		|	39 ms
-QPS		|	72				|	250
-p95		|	480ms（canary）	|	恢复正常
+|指标		|	回退前			|	回退后	|
+|-----------|-------------------|-----------|
+|Avg 		|	延迟	138 ms		|	39 ms	|
+|QPS		|	72				|	250		|
+|p95		|	480ms（canary）	|	恢复正常	|
 
 ✅ 核心结论
 - Canary 版本在高负载下导致性能严重下降。

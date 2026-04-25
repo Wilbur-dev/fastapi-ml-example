@@ -82,7 +82,7 @@
 
 ## 8. Canary 灰度发布与回退演练
 
-![canary](week7_evidence/day5_30%-50%灰度evidence/50%/ingress.png)
+![canary](week7_evidence/day5_30pct-50pct灰度evidence/50pct/ingress.png)
 ![rollback](week7_evidence/回退演练evidence/回退后p95变化.png)
 
 - 同时部署 stable 与 canary 两个版本，实现双版本共存

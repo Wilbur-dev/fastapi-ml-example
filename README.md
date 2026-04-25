@@ -18,7 +18,7 @@
 ---
 
 ## 2. 系统架构（Architecture）
-
+```text
                 ┌──────────────┐
                 │   Client     │
                 │  (curl/API)  │
@@ -36,14 +36,14 @@
 ┌───────────────┐         ┌───────────────┐
 │   Pod (Stable)│         │  Pod (Canary) │
 │  ML Model     │         │  ML Model     │
-└──────┬────────┘         └──────┬────────┘
+└──────┬────────┘         └──────┬────────┘  
        │                         │
        └────────────┬────────────┘
                     ▼
-            ┌──────────────────┐
-            │  Kubernetes      │
+            ┌───────────────────┐
+            │  Kubernetes       │
             │ Deployment/Service│
-            └────────┬─────────┘
+            └────────┬──────────┘
                      │
      ┌───────────────┼────────────────┐
      ▼               ▼                ▼
@@ -65,7 +65,7 @@
             │ GitHub Actions   │
             │ CI (build/push)  │
             └──────────────────┘
-
+```text
 
 系统整体流程：
 
@@ -74,7 +74,7 @@ Client → FastAPI → Kubernetes → Model → Monitoring → CI/CD
 ---
 
 ## 3. 系统时序 （System Flow）
-
+```text
 Client
   │
   ▼
@@ -100,9 +100,11 @@ Return Response (/predict)
            │
            ▼
         Grafana
+```
         
-- With Canary：
+=== With Canary ===
 
+```text
 Client
   │
   ▼
@@ -114,6 +116,7 @@ Ingress (traffic split 90/10)
           │
           ▼
       FastAPI → Model → Response
+```
 
 ---
 
@@ -231,7 +234,7 @@ GET /version
 
 👉 查看详细截图与结果：
 
-![docs/results.md](docs/results.md)
+[docs/results.md](docs/results.md)
 
 ---
 

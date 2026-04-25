@@ -53,14 +53,16 @@ dev 与 prod 主要区别：
 ---
 
 ## 项目结构
+```bash
 project/
-    app/ # FastAPI 应用
-    k8s/
-        dev/ # dev 环境配置
-        prod/ # prod 环境配置
-    .github/workflows/ # CI/CD 流水线
-    docs/ # 文档
-    README.md
+├── app/ # FastAPI 应用
+├── k8s/
+│   ├── dev/ # dev 环境配置
+│   └── prod/ # prod 环境配置
+├── .github/workflows/ # CI/CD 流水线
+├── docs/ # 文档
+└── README.md
+```
 
 ---
 
@@ -192,6 +194,7 @@ project/
 ---
 
 ## 当前系统架构（简化）
+```text
 Training / MLflow Tracking
 ↓
 promote_model.py
@@ -203,6 +206,7 @@ Docker image（仅包含部署模型）
 ↓
 K8s / 服务加载
 （统一 MODEL_URI）
+```
 
 
 ---
@@ -277,9 +281,9 @@ MODEL_URI=models:/not_exist/999
 ## 2. 故障注入（Failure Injection）
 
 通过以下命令触发故障：
-
+```bash
 kubectl set env deployment/fastapi-ml MODEL_URI=models:/not_exist/999
-
+```
 更新环境变量后，Kubernetes 触发滚动更新，并尝试使用该错误配置启动新的 Pod。
 
 ## 3. 现象（Symptoms）
@@ -295,12 +299,12 @@ kubectl rollout status 无法成功完成
 ## 4. 定位（Investigation）
 
 通过以下常规排障命令进行分析：
-
+```bash
 kubectl get pods
 kubectl describe pod <pod-name>
 kubectl logs <pod-name>
 kubectl rollout history deployment/fastapi-ml
-
+```
 关键发现：
 
 新 Pod 持续重启
@@ -327,13 +331,15 @@ FastAPI 生命周期钩子（lifespan）尝试加载模型
 ## 6. 恢复（回滚）（Recovery / Rollback）
 
 通过以下命令进行回滚：
-
+```bash
 kubectl rollout undo deployment/fastapi-ml
+```
 
 随后验证：
 
+```bash
 kubectl rollout status deployment/fastapi-ml
-
+```
 回滚结果：
 
 旧版本 Pod 恢复为运行状态
@@ -343,10 +349,10 @@ kubectl rollout status deployment/fastapi-ml
 ## 7. 验证（Verification）
 
 回滚后执行：
-
+```bash
 kubectl get pods
 kubectl rollout history deployment/fastapi-ml
-
+```
 结果：
 
 所有 Pod 均正常运行
@@ -360,13 +366,14 @@ Kubernetes 滚动更新机制能够保障服务可用性
 ## 9. 对 CI/CD 的启示（CI/CD Implication）
 
 基于本次实验，CD 流水线应包含：
-
+```bash
 kubectl rollout status --timeout=...
+```
 
 以及自动回滚机制：
-
+```bash
 kubectl rollout undo deployment/fastapi-ml
-
+```
 从而实现：
 
 自动检测发布失败
@@ -375,9 +382,9 @@ kubectl rollout undo deployment/fastapi-ml
 
 本实验验证了：
 
-系统能够应对错误模型配置带来的风险
-回滚机制可以快速恢复服务
-失败检测 + 自动回滚 是生产级 ML 部署的关键能力
+- 系统能够应对错误模型配置带来的风险
+- 回滚机制可以快速恢复服务
+- 失败检测 + 自动回滚 是生产级 ML 部署的关键能力
 
 该案例构成了 CI/CD 流水线中“可靠发布能力”的重要组成部分。
 
@@ -427,10 +434,9 @@ dev 与 prod 至少存在以下三点差异：
 - 生产环境采用**手动发布**
 
 dev 部署：
-```bash
+
 kubectl apply -n dev -f k8s/dev/
-```
+
 prod 部署（手动）：
-```bash
+
 kubectl apply -f k8s/prod/
-```

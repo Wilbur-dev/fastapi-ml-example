@@ -239,39 +239,44 @@ if runtime.release_track == "canary":
 
 流量分配：
 
-stable：约 50%
-canary：约 50%
+- stable：约 50%
+- canary：约 50%
 
 ## 三、回退前状态（Before Rollback）
 1. Ingress 状态
+```bash
 kubectl get ingress
 kubectl describe ingress fastapi-ml-canary
+```
 
 确认：
 
-canary ingress 存在
-已配置流量权重（如 50%）
+- canary ingress 存在
+- 已配置流量权重（如 50%）
 
 
 2. 服务行为
-·/predict 请求同时命中：
-stable
-canary
-·日志中同时出现：
-release_track=stable
-release_track=canary
+- /predict 请求同时命中：
+    - stable
+    - canary
+
+- 日志中同时出现：
+    - release_track=stable
+    - release_track=canary
 
 ## 四、问题观测（Issue Observation）
 
 通过压测触发流量：
-
+```bash
 hey -n 20000 -c 50 ...
+```
 
 观察到：
 
-canary 延迟显著高于 stable
-error rate 正常（未报错）
-返回格式保持一致
+- canary 延迟显著高于 stable
+- error rate 正常（未报错）
+- 返回格式保持一致
+
 判定结果：
 
 根据发布标准：
@@ -284,80 +289,86 @@ error rate 正常（未报错）
 ## 五、回退操作（Rollback Action）
 
 执行流量级回退：
-
+```bash
 kubectl delete -f k8s/prod/canary/ingress.yaml
+```
 
 说明：
-不删除 pod
-不修改 deployment
-仅移除流量入口
+- 不删除 pod
+- 不修改 deployment
+- 仅移除流量入口
 
 ## 六、回退后验证（After Rollback）
 1. Ingress 状态
+```bash
 kubectl get ingress
+```
 
 结果：
 
-仅剩 stable ingress
-canary ingress 已删除
+- 仅剩 stable ingress
+- canary ingress 已删除
 
 2. 日志验证
+```bash
 kubectl logs deployment/fastapi-ml-canary -f
+```
 
 观察：
-canary：仅剩 /health 和 /metrics
+- canary：仅剩 /health 和 /metrics
 
 👉 说明：
 
-业务流量已完全移出 canary
-仅保留系统探针请求
+- 业务流量已完全移出 canary
+- 仅保留系统探针请求
 
 3. 监控验证（Grafana）
-canary 流量归零
-p95 恢复正常
-所有请求回到 stable
+- canary 流量归零
+- p95 恢复正常
+- 所有请求回到 stable
 
 ## 七、实验结论（Conclusion）
 
 本次演练验证了系统具备：
 
 ✅ 1. 灰度发布能力
-stable / canary 共存
-流量可控分配
+- stable / canary 共存
+- 流量可控分配
+
 ✅ 2. 风险识别能力
-通过 p95 延迟识别异常版本
+- 通过 p95 延迟识别异常版本
+
 ✅ 3. 快速回退能力（核心）
-通过移除 ingress 实现流量回退
-无需重启服务或回滚镜像
+- 通过移除 ingress 实现流量回退
+- 无需重启服务或回滚镜像
+
 ✅ 4. 系统稳定性保障
-回退后服务立即恢复正常
+- 回退后服务立即恢复正常
 
 
-八、关键经验（Key Takeaways）
+## 八、关键经验（Key Takeaways）
 1️⃣ 流量回退优先于版本回退
 
-在生产环境中：
+- 在生产环境中：优先切流量，而不是先 rollback deployment
 
-优先切流量，而不是先 rollback deployment
+- 原因：
+    - 更快（秒级）
+    - 更安全（不影响运行中的 pod）
+    - 更符合线上应急流程
 
-原因：
-
-更快（秒级）
-更安全（不影响运行中的 pod）
-更符合线上应急流程
 2️⃣ 指标驱动发布决策
 
 灰度发布不能依赖主观判断，必须基于：
+- latency（p95）
+- error rate
+- response compatibility
 
-latency（p95）
-error rate
-response compatibility
 3️⃣ 可观测性是灰度发布的基础
 
 本次实验依赖：
 
-Prometheus 指标
-Grafana 可视化
-日志中的 release_track
+- Prometheus 指标
+- Grafana 可视化
+- 日志中的 release_track
 
 👉 没有这些，无法判断是否回退
