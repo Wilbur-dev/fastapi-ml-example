@@ -1,4 +1,4 @@
-# 📊 Canary + 回退测试报告
+# 📊 Canary + 回滚测试报告
 
 ## 1️⃣ 灰度流量验证（50%阶段）
 📌 测试命令
@@ -17,17 +17,17 @@ kubectl logs fastapi-ml-canary-xxx | grep request_id | wc -l
 
 ---
 
-## 2️⃣ 性能分析（回退前）
+## 2️⃣ 性能分析（回滚前）
 🔴 p95 延迟
 
-![回退前 p95 图](week7_evidence/回退演练evidence/回退前压测p95.png)
+![回滚前 p95 图](week7_evidence/回滚演练evidence/回滚前压测p95.png)
 
 📌 观察
 - stable ≈ 5 ms
 - canary ≈ 480 ms
 🔴 压测结果
 
-![回退前压测](week7_evidence/回退演练evidence/回退前压测结果.png)
+![回滚前压测](week7_evidence/回滚演练evidence/回滚前压测结果.png)
 
 📌 数据
 - Avg latency ≈ 138 ms
@@ -63,7 +63,7 @@ if runtime.release_track == "canary":
 
 ---
 
-## 3️⃣ 回退操作
+## 3️⃣ 回滚操作
 📌 执行命令
 ```bash
 kubectl delete -f k8s/prod/canary/ingress.yaml
@@ -71,7 +71,7 @@ kubectl delete -f k8s/prod/canary/ingress.yaml
 
 📌 Ingress 状态
 
-![回退操作](week7_evidence/回退演练evidence/回退.png)
+![回滚操作](week7_evidence/回滚演练evidence/回滚.png)
 
 👉 只剩 stable
 
@@ -79,16 +79,16 @@ kubectl delete -f k8s/prod/canary/ingress.yaml
 ---
 
 
-## 4️⃣ 回退后验证
+## 4️⃣ 回滚后验证
 ✅ 功能验证
 ```bash
 curl http://fastapi-ml.local/version
 ```
-![功能验证](week7_evidence/回退演练evidence/回退后功能验证.png)
+![功能验证](week7_evidence/回滚演练evidence/回滚后功能验证.png)
 
 ✅ 日志验证
 
-![canary日志](week7_evidence/回退演练evidence/canary只剩health和metrics.png)
+![canary日志](week7_evidence/回滚演练evidence/canary只剩health和metrics.png)
 
 📌 观察
 - 仅存在：
@@ -97,28 +97,28 @@ curl http://fastapi-ml.local/version
 - 没有 /predict
 
 ✅ 结论
-- 回退后 canary 已不再接收业务流量。
+- 回滚后 canary 已不再接收业务流量。
 
 ---
 
-## 5️⃣ 回退后性能分析
-🟢 压测结果（回退后）
+## 5️⃣ 回滚后性能分析
+🟢 压测结果（回滚后）
 
-![回退后压测](week7_evidence/回退演练evidence/回退后压测结果.png)
+![回滚后压测](week7_evidence/回滚演练evidence/回滚后压测结果.png)
 
 📌 数据
 Avg latency ≈ 39 ms
 QPS ≈ 250 req/s
 🟢 p95 延迟
 
-![回退后p95变化](week7_evidence/回退演练evidence/回退后p95变化.png)
+![回滚后p95变化](week7_evidence/回滚演练evidence/回滚后p95变化.png)
 
 📌 观察
 - 恢复到正常水平（≈5ms）
 
 🟢 QPS 变化
 
-![回退后QPS变化](week7_evidence/回退演练evidence/回退后QPS变化.png)
+![回滚后QPS变化](week7_evidence/回滚演练evidence/回滚后QPS变化.png)
 
 📌 观察
 - canary → 0
@@ -126,8 +126,8 @@ QPS ≈ 250 req/s
 
 ---
 
-## 🔥 6️⃣ 回退前后对比
-|指标		|	回退前			|	回退后	|
+## 🔥 6️⃣ 回滚前后对比
+|指标		|	回滚前			|	回滚后	|
 |-----------|-------------------|-----------|
 |Avg 		|	延迟	138 ms		|	39 ms	|
 |QPS		|	72				|	250		|
@@ -135,7 +135,7 @@ QPS ≈ 250 req/s
 
 ✅ 核心结论
 - Canary 版本在高负载下导致性能严重下降。
-- 通过回退操作，系统快速恢复至稳定状态，
+- 通过回滚操作，系统快速恢复至稳定状态，
 - 证明 Canary 发布机制能够有效隔离风险。
 
 ---
@@ -143,5 +143,5 @@ QPS ≈ 250 req/s
 ## 🎯 7️⃣ 测试总结
 1. 成功实现 Canary 灰度发布
 2. 通过监控识别性能问题
-3. 成功执行回退并验证系统恢复
+3. 成功执行回滚并验证系统恢复
 4. 完成生产级部署闭环（deploy → observe → rollback）
