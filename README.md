@@ -124,7 +124,7 @@ Ingress (traffic split 90/10)
 - 基于 FastAPI 的模型推理服务（/predict /health /version）
 - 使用 MLflow 进行模型实验记录与版本管理
 - Kubernetes 多副本部署（Deployment + Service）
-- Readiness / Liveness 探针 + Rolling Update· 
+- Readiness / Liveness 探针 + Rolling Update 
 - Prometheus + Grafana 监控系统指标
 - HPA 自动扩缩容（基于 CPU）
 - GitHub Actions 实现自动构建（CI）
@@ -143,15 +143,22 @@ docker compose up --build api
 访问接口：
 ```
 curl http://localhost:8000/health
-curl -X POST http://localhost:8000/predict ...
+curl -X POST http://localhost:8000/predict \
+  -H "Content-Type: application/json" \
+  -d '{
+    "feature1": 1.0,
+    "feature2": 2.0,
+    "request_id": "demo-001"
+  }'
 ```
 
 
 ### Kubernetes 部署
 ```bash
-kubectl apply -f k8s/
-kubectl get pods
-kubectl port-forward svc/fastapi-ml 8000:8000
+kubectl apply -f k8s/prod/stable
+kubectl get pods -l track=stable
+kubectl get svc fastapi-ml-stable
+kubectl port-forward svc/fastapi-ml-stable 8000:8000
 ```
 
 ---
