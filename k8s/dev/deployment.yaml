@@ -17,12 +17,12 @@ spec:
       labels:
         app: fastapi-ml   # ✅ Pod 标签（必须和上面一致）
         component: inference-api
-        version: week6-day5
+        version: week8
         track: dev
     spec:
       containers:
         - name: fastapi-ml   # ✅ 容器名
-          image: fastapi-ml-example:week6-day2-test   # ✅ 镜像名
+          image: fastapi-ml-example:week8   # ✅ 镜像名
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -33,11 +33,15 @@ spec:
             - name: MODEL_STAGE
               value: "staging"
             - name: APP_VERSION
-              value: "week6:day5"
+              value: "week8"
             - name: RELEASE_TRACK
               value: "dev"
             - name: MODEL_PATH
               value: "/app/models/lr_model.joblib"
+            - name: IMAGE_TAG
+              value: "dev"
+            - name: MODEL_VERSION
+              value: "dev"
             #- name: MLFLOW_TRACKING_URI
             #  value: "file:///app/mlruns"
             #- name: MLFLOW_REGISTRY_URI

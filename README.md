@@ -232,6 +232,7 @@ GET /version
 - 指标异常时回滚至 stable
 
 👉 查看计划与报告：
+
 [灰度计划](docs/canary_plan.md)
 
 [灰度报告](docs/canary_report.md)

@@ -19,12 +19,12 @@ spec:
       labels:
         app: fastapi-ml   # ✅ Pod 标签（必须和上面一致）
         component: inference-api
-        version: canary-v1
+        version: week8-canary
         track: canary
     spec:
       containers:
         - name: fastapi-ml   # ✅ 容器名
-          image: fastapi-ml-example:week7c   # ✅ 镜像名
+          image: fastapi-ml-example:week8   # ✅ 镜像名
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8000
@@ -35,7 +35,7 @@ spec:
             - name: MODEL_STAGE
               value: "production"
             - name: APP_VERSION
-              value: "week7-canary-v1"
+              value: "week8-canary"
             - name: RELEASE_TRACK
               value: "canary"
             - name: MODEL_PATH

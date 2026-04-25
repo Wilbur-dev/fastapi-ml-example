@@ -12,6 +12,8 @@ class ModelRuntime:
         self.image_tag = settings.image_tag
         if settings.model_version:
             self.model_version = settings.model_version
+        elif model_uri.startswith("file:/"):
+            self.model_version = "run-loaded-model"
         elif model_uri.startswith("models:/"):
             self.model_version = model_uri.rstrip("/").split("/")[-1]
         elif model_uri.startswith("runs:/"):
