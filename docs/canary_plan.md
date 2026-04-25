@@ -6,7 +6,7 @@
 
 - 通过**Canary（灰度发布）策略**安全上线新模型版本
 - 在逐步放量过程中验证系统表现
-- 在出现性能问题时执行**回退（rollback）**，验证系统恢复能力
+- 在出现性能问题时执行**回滚（rollback）**，验证系统恢复能力
 
 ---
 
@@ -54,17 +54,17 @@ nginx.ingress.kubernetes.io/canary-weight: X
 
 ---
 
-## 3️⃣ 回退策略（关键）
+## 3️⃣ 回滚策略（关键）
 
-### 3.1 回退触发条件
+### 3.1 回滚触发条件
 
-当出现以下情况时执行回退：
+当出现以下情况时执行回滚：
 
 - canary延迟明显高于stable
 - 系统吞吐下降
 - 存在异常行为
 
-### 3.2 回退方法
+### 3.2 回滚方法
 
 本次测试采用：
 
@@ -73,7 +73,7 @@ nginx.ingress.kubernetes.io/canary-weight: X
 kubectl delete -f k8s/prod/canary/ingress.yaml
 ```
 
-### 3.3 回退后的预期结果
+### 3.3 回滚后的预期结果
 - 所有流量回到stable
 - canary不再接收请求
 - 系统性能恢复

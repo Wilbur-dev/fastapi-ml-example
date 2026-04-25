@@ -80,12 +80,12 @@
 
 ---
 
-## 8. Canary 灰度发布与回退演练
+## 8. Canary 灰度发布与回滚演练
 
 ![canary](week7_evidence/day5_30pct-50pct灰度evidence/50pct/ingress.png)
-![rollback](week7_evidence/回退演练evidence/回退后p95变化.png)
+![rollback](week7_evidence/回滚演练evidence/回滚后p95变化.png)
 
 - 同时部署 stable 与 canary 两个版本，实现双版本共存
 - 通过 Ingress 控制流量比例（10% → 30% → 50%）
-- 基于延迟与错误率判断是否继续放量或回退
+- 基于延迟与错误率判断是否继续放量或回滚
 - 当指标异常时回滚至 stable，系统恢复正常

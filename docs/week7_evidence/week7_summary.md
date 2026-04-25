@@ -102,7 +102,7 @@
 ## 下一步
 
 - 编写 canary 验证标准文档
-- 明确继续放量与停止回退的阈值
+- 明确继续放量与停止回滚的阈值
 - 对 stable 和 canary 的延迟、错误率、返回字段兼容性进行对比
 
 
@@ -220,7 +220,7 @@
 
 在完成 stable / canary 双版本部署和流量分配后，本次实验的目标是验证：
 
-> 当 canary 版本表现异常时，系统是否能够**快速、安全地回退流量**，恢复稳定服务。
+> 当 canary 版本表现异常时，系统是否能够**快速、安全地回滚流量**，恢复稳定服务。
 
 本次演练重点不在部署，而在**发布风险控制能力**。
 
@@ -242,7 +242,7 @@ if runtime.release_track == "canary":
 - stable：约 50%
 - canary：约 50%
 
-## 三、回退前状态（Before Rollback）
+## 三、回滚前状态（Before Rollback）
 1. Ingress 状态
 ```bash
 kubectl get ingress
@@ -286,9 +286,9 @@ hey -n 20000 -c 50 ...
 
 👉 判定 canary 版本不可继续放量
 
-## 五、回退操作（Rollback Action）
+## 五、回滚操作（Rollback Action）
 
-执行流量级回退：
+执行流量级回滚：
 ```bash
 kubectl delete -f k8s/prod/canary/ingress.yaml
 ```
@@ -298,7 +298,7 @@ kubectl delete -f k8s/prod/canary/ingress.yaml
 - 不修改 deployment
 - 仅移除流量入口
 
-## 六、回退后验证（After Rollback）
+## 六、回滚后验证（After Rollback）
 1. Ingress 状态
 ```bash
 kubectl get ingress
@@ -338,16 +338,16 @@ kubectl logs deployment/fastapi-ml-canary -f
 ✅ 2. 风险识别能力
 - 通过 p95 延迟识别异常版本
 
-✅ 3. 快速回退能力（核心）
-- 通过移除 ingress 实现流量回退
+✅ 3. 快速回滚能力（核心）
+- 通过移除 ingress 实现流量回滚
 - 无需重启服务或回滚镜像
 
 ✅ 4. 系统稳定性保障
-- 回退后服务立即恢复正常
+- 回滚后服务立即恢复正常
 
 
 ## 八、关键经验（Key Takeaways）
-1️⃣ 流量回退优先于版本回退
+1️⃣ 流量回滚优先于版本回滚
 
 - 在生产环境中：优先切流量，而不是先 rollback deployment
 
@@ -371,4 +371,4 @@ kubectl logs deployment/fastapi-ml-canary -f
 - Grafana 可视化
 - 日志中的 release_track
 
-👉 没有这些，无法判断是否回退
+👉 没有这些，无法判断是否回滚
